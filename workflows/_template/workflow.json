@@ -1,0 +1,101 @@
+{
+  "name": "Scholli Template Workflow",
+  "nodes": [
+    {
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Formular-Eingang",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [0, 300],
+      "parameters": {
+        "formTitle": "Mieter-Anliegen",
+        "formDescription": "Automatisch vom Scholli-Agent ausgefüllt",
+        "formFields": {
+          "values": [
+            { "fieldLabel": "Name", "fieldType": "text", "requiredField": true },
+            { "fieldLabel": "E-Mail", "fieldType": "email", "requiredField": true },
+            { "fieldLabel": "Adresse", "fieldType": "text", "requiredField": true },
+            { "fieldLabel": "Wohnung", "fieldType": "text", "requiredField": false },
+            { "fieldLabel": "Anliegen", "fieldType": "textarea", "requiredField": true },
+            { "fieldLabel": "Kategorie", "fieldType": "dropdown", "fieldOptions": { "values": [
+              { "option": "TBB" },
+              { "option": "Vermietung" },
+              { "option": "Mitglieder" },
+              { "option": "Rechnungswesen" },
+              { "option": "HSG" },
+              { "option": "Öffentlichkeitsarbeit" }
+            ]}, "requiredField": true },
+            { "fieldLabel": "Dringlichkeit", "fieldType": "dropdown", "fieldOptions": { "values": [
+              { "option": "normal" },
+              { "option": "hoch" },
+              { "option": "dringend" }
+            ]}, "requiredField": false }
+          ]
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "a1b2c3d4-0001-4000-8000-000000000002",
+      "name": "Empfänger-Routing",
+      "type": "n8n-nodes-base.code",
+      "position": [300, 300],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const routing = {\n  'TBB': 'tbb@freiescholle.de',\n  'Vermietung': 'vermietung@freiescholle.de',\n  'Mitglieder': 'mitglieder@freiescholle.de',\n  'Rechnungswesen': 'rechnungswesen@freiescholle.de',\n  'HSG': 'hsg@freiescholle.de',\n  'Öffentlichkeitsarbeit': 'presse@freiescholle.de'\n};\n\nconst category = $input.item.json['Kategorie'];\nconst email = routing[category] || 'info@freiescholle.de';\nconst isUrgent = $input.item.json['Dringlichkeit'] === 'dringend';\nconst prefix = isUrgent ? '[DRINGEND] ' : '';\n\nreturn [{\n  json: {\n    ...$input.item.json,\n    department_email: email,\n    department: category,\n    subject_prefix: prefix\n  }\n}];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "a1b2c3d4-0001-4000-8000-000000000003",
+      "name": "Mail an Fachabteilung",
+      "type": "n8n-nodes-base.gmail",
+      "position": [600, 200],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "={{ $json.department_email }}",
+        "subject": "={{ $json.subject_prefix }}[Scholli] {{ $json.Kategorie }} — {{ $json.Name }}",
+        "message": "=Neues Mieter-Anliegen via Scholli:\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n👤 Mieter: {{ $json.Name }}\n🏠 Adresse: {{ $json.Adresse }}, Whg. {{ $json.Wohnung }}\n📧 E-Mail: {{ $json['E-Mail'] }}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📋 Anliegen:\n{{ $json.Anliegen }}\n\n⚡ Dringlichkeit: {{ $json.Dringlichkeit || 'normal' }}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nAutomatisch erstellt von Scholli",
+        "options": {
+          "appendAttributionToBody": false
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "a1b2c3d4-0001-4000-8000-000000000004",
+      "name": "Bestätigung an Mieter",
+      "type": "n8n-nodes-base.gmail",
+      "position": [600, 400],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "={{ $json['E-Mail'] }}",
+        "subject": "=Dein Anliegen bei der Freien Scholle — {{ $json.Kategorie }}",
+        "message": "=Hallo {{ $json.Name }},\n\nwir haben dein Anliegen aufgenommen:\n\n📋 {{ $json.Anliegen }}\n🏠 {{ $json.Adresse }}\n\nUnsere Abteilung {{ $json.department }} kümmert sich darum.\nDu erhältst eine Rückmeldung, sobald es Neuigkeiten gibt.\n\nFreundliche Grüße,\nScholli — Dein digitaler Assistent der Freien Scholle",
+        "options": {
+          "appendAttributionToBody": false
+        }
+      },
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "Formular-Eingang": {
+      "main": [
+        [
+          { "node": "Empfänger-Routing", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Empfänger-Routing": {
+      "main": [
+        [
+          { "node": "Mail an Fachabteilung", "type": "main", "index": 0 },
+          { "node": "Bestätigung an Mieter", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
