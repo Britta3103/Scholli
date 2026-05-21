@@ -119,10 +119,13 @@ Wenn ein User einen dieser Commands nutzt, lies die entsprechende Skill-Datei un
 | `deploy-agent.ps1` | Deployt/updated einen Agent via Langdock API | `.\scripts\deploy-agent.ps1 -AgentPath "agents/<name>"` |
 ## API Key
 
-Stored in Azure Key Vault:
-- Vault: `kv-cassini-ki-dev`
-- Secret: `langdock-api-key`
-- Scopes: All (Agenten, Completion, Embedding, Integrations, etc.)
+Stored in **Infisical** (self-hosted, `http://localhost:3000`):
+- Project: `Scholli`
+- Environment: `prod`
+- Secret name: `LANGDOCK_API_KEY`
+
+The deploy script fetches the key automatically via Infisical CLI.  
+First-time setup: see `docs/infisical-setup.md`.
 
 ## Important Limits
 
