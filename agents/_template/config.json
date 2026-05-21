@@ -1,0 +1,30 @@
+{
+  "$schema": "https://github.com/Britta3103/Scholli/blob/main/agents/_template/config.json",
+  "_comment": "Langdock Agent Configuration — Ersetze alle <PLATZHALTER>",
+  "agentId": null,
+  "name": "<AGENT-NAME>",
+  "description": "<Kurzbeschreibung, max 500 Zeichen>",
+  "emoji": "🏠",
+  "model": null,
+  "creativity": 0.1,
+  "inputType": "PROMPT",
+  "webSearch": false,
+  "imageGeneration": false,
+  "dataAnalyst": false,
+  "canvas": false,
+  "extendedThinking": false,
+  "conversationStarters": [
+    "<Beispiel-Frage 1>",
+    "<Beispiel-Frage 2>"
+  ],
+  "actions": [],
+  "attachments": [],
+  "workflows": [
+    {
+      "_comment": "Workflow der vom Agent getriggert wird",
+      "name": "<WORKFLOW-NAME>",
+      "id": "<WORKFLOW-UUID>",
+      "triggerType": "form|manual"
+    }
+  ]
+}
