@@ -1,59 +1,91 @@
 # Scholli 🏠
 
-**Frontdesk-Agent für die Wohnungsbaugesellschaft "Freie Scholle"**
+**Agenten-Flotte für die Wohnungsbaugesellschaft "Freie Scholle" (Bielefeld)**
 
-Scholli ist ein KI-gestützter Chat-Agent auf der [Langdock](https://langdock.com)-Plattform, der Mietern bei ihren täglichen Anliegen hilft.
+> 5.000 Wohneinheiten | Langdock-Plattform | Spezialisierte KI-Agenten
 
-## Überblick
+## Was ist Scholli?
 
-| Eigenschaft | Wert |
-|-------------|------|
-| Plattform | [Langdock](https://app.langdock.com) |
-| Agent-ID | `a1b11586-0e78-4e5a-b36d-bfe7c9995ee8` |
-| Workflow-ID | `8723e518-81bd-4672-9591-a6b67d685fa4` |
-| Modell | Workspace-Default |
-| Temperature | 0.1 |
-| Erstellt | 17.05.2026 |
+Scholli ist eine Flotte von KI-Agenten, die Mietern der Freien Scholle bei alltäglichen Anliegen hilft — von Reparaturmeldungen über Kündigungsfragen bis zur Nebenkostenabrechnung.
 
 ## Architektur
 
 ```
-Mieter (Chat) → Scholli Agent → Scholli Mail Workflow → Interne Weiterleitung
+Mieter (Chat) → Router Agent → Spezialist → Workflow → Fachabteilung
 ```
 
-1. **Scholli Agent** nimmt Anliegen entgegen und fragt fehlende Infos ab
-2. Bei vollständigen Angaben triggert der Agent den **Scholli Mail Workflow**
-3. Der Workflow verarbeitet die strukturierten Daten und leitet intern weiter
+### Agenten-Flotte
 
-## Repository-Struktur
+| # | Agent | Status | Aufgabe |
+|---|-------|--------|---------|
+| 0 | 🎯 Router | 🔲 TODO | Erkennt Anliegen, leitet weiter |
+| 1 | 🏘️ Vermietung | 🔲 TODO | Wohnungssuche, Kündigung, Tausch |
+| 2 | 🔧 TBB | ✅ v1 vorhanden | Reparaturen, Schäden, Schlüssel |
+| 3 | 📋 Mitglieder | 🔲 TODO | Namensänderung, Dokumente, Termine |
+| 4 | 💰 Rechnungswesen | 🔲 TODO | Nebenkosten, Bank, Spareinrichtung |
+| 5 | 🌿 HSG | 🔲 TODO | Garten, Außenanlagen |
+| 6 | 📰 Öffentlichkeitsarbeit | 🔲 TODO | Mieterzeitung, Newsletter |
+
+## Quick Start (für Britta mit Claude Code)
+
+### 1. Repo klonen
+```bash
+git clone https://github.com/Britta3103/Scholli.git
+cd Scholli
+```
+
+### 2. Neuen Agent erstellen
+```bash
+# Template kopieren
+cp -r agents/_template agents/mein-agent
+
+# System-Prompt bearbeiten
+# → agents/mein-agent/system-prompt.md
+
+# Config anpassen
+# → agents/mein-agent/config.json
+```
+
+### 3. Agent in Langdock anlegen
+- Langdock UI → Agents → Create
+- System-Prompt einfügen
+- Workflow verknüpfen (Actions → Workflows)
+- Testen!
+
+### 4. Optional: Per API deployen
+```bash
+# Siehe scripts/deploy-agent.ps1
+```
+
+## Dokumentation
+
+| Dokument | Beschreibung |
+|----------|-------------|
+| [Requirements](docs/requirements.md) | Vollständige Anforderungsspezifikation |
+| [Architecture](docs/architecture.md) | Technische Architektur & Node-Typen |
+| [Langdock API](docs/langdock-api.md) | API-Referenz mit Beispielen |
+| [Platform Reference](docs/langdock-platform-reference.md) | Komplette Langdock-Doku (92 KB) |
+| [CLAUDE.md](CLAUDE.md) | AI-Instructions für Claude Code |
+
+## Entwicklungs-Workflow
 
 ```
-├── README.md                    # Dieses Dokument
-├── docs/
-│   ├── architecture.md          # Technische Architektur & Langdock-Plattform
-│   └── langdock-api.md          # API-Referenz & Zugriffsmöglichkeiten
-├── agent/
-│   └── system-prompt.md         # Aktueller System-Prompt des Agents
-└── workflows/
-    └── scholli-mail-workflow.md  # Workflow-Dokumentation
+1. Prompt schreiben (agents/<name>/system-prompt.md)
+2. Im Langdock Chat testen
+3. Iterieren bis Verhalten stimmt
+4. Workflow in Langdock Builder erstellen
+5. Agent + Workflow verknüpfen
+6. End-to-End testen
+7. Committen & dokumentieren
 ```
-
-## Zugriff
-
-- **Agent API:** `GET/PATCH https://api.langdock.com/agent/v1/...`
-- **Workflow:** Nur über UI oder Webhook-Trigger
-- **API Key:** Azure Key Vault `kv-cassini-ki-dev` → Secret `langdock-api-key`
-
-## Entwicklung
-
-Workflows können nicht direkt per API erstellt werden. Stattdessen:
-
-1. Agent-Prompt hier pflegen → per API deployen
-2. Workflow-Änderungen als n8n-kompatibles JSON oder Builder-Prompt vorbereiten
-3. In Langdock Builder-Chat einspeisen
 
 ## Links
 
-- [Langdock Agent UI](https://app.langdock.com/agents/a1b11586-0e78-4e5a-b36d-bfe7c9995ee8/edit)
-- [Langdock Workflow UI](https://app.langdock.com/workflows/8723e518-81bd-4672-9591-a6b67d685fa4)
-- [Langdock API Docs](https://docs.langdock.com/api-endpoints/api-introduction)
+- [Langdock Platform](https://app.langdock.com)
+- [Scholli Agent (TBB v1)](https://app.langdock.com/agents/a1b11586-0e78-4e5a-b36d-bfe7c9995ee8/edit)
+- [Scholli Mail Workflow](https://app.langdock.com/workflows/8723e518-81bd-4672-9591-a6b67d685fa4)
+- [Langdock API Docs](https://docs.langdock.com)
+
+---
+
+*Entwickelt von Sven Rosemann (Cassini AG) & Britta*
