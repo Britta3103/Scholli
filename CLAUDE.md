@@ -103,6 +103,20 @@ curl -X POST https://api.langdock.com/agent/v1/create \
 
 ⚠️ API updates create DRAFTS — must publish in Langdock UI.
 
+
+## Custom Commands / Skills
+
+| Command | Beschreibung | Datei |
+|---------|-------------|-------|
+| `/create-agent <name>` | Erstellt einen neuen Langdock-Agenten (Prompt + Config + API-Deploy) | `skills/create-agent.md` |
+
+Wenn ein User einen dieser Commands nutzt, lies die entsprechende Skill-Datei und führe die Steps aus.
+
+## Scripts
+
+| Script | Beschreibung | Aufruf |
+|--------|-------------|--------|
+| `deploy-agent.ps1` | Deployt/updated einen Agent via Langdock API | `.\scripts\deploy-agent.ps1 -AgentPath "agents/<name>"` |
 ## API Key
 
 Stored in Azure Key Vault:
